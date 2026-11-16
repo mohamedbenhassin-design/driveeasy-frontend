@@ -1,0 +1,93 @@
+<div class="page-header">
+  <div>
+    <h1>Locations</h1>
+    <p>{{ page()?.totalElements ?? 0 }} location(s)</p>
+  </div>
+  <a routerLink="/locations/new" class="btn btn-primary">+ Nouvelle location</a>
+</div>
+
+<form class="card filters" (ngSubmit)="charger(0)">
+  <div class="field">
+    <label for="statut">Statut</label>
+    <select id="statut" name="statut" [(ngModel)]="filtres.statut" (change)="charger(0)">
+      <option value="">Tous</option>
+      @for (s of statuts; track s) { <option [value]="s">{{ libelle(s) }}</option> }
+    </select>
+  </div>
+  <div class="field">
+    <label for="dateDebut">Du</label>
+    <input id="dateDebut" name="dateDebut" type="date" [(ngModel)]="filtres.dateDebut" />
+  </div>
+  <div class="field">
+    <label for="dateFin">Au</label>
+    <input id="dateFin" name="dateFin" type="date" [(ngModel)]="filtres.dateFin" />
+  </div>
+  <button type="submit" class="btn btn-primary">Filtrer</button>
+  <button type="button" class="btn" (click)="reinitialiser()">Réinitialiser</button>
+</form>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Client</th>
+          <th>Véhicule</th>
+          <th>Période</th>
+          <th class="right">Montant</th>
+          <th>Statut</th>
+          <th class="right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (l of page()?.content ?? []; track l.id) {
+          <tr>
+            <td>#{{ l.id }}</td>
+            <td><a [routerLink]="['/clients', l.clientId]">{{ nomClient()(l.clientId) }}</a></td>
+            <td>{{ nomVehicule()(l.vehiculeId) }}</td>
+            <td>
+              {{ l.dateDebut | date: 'dd/MM/yyyy' }} → {{ l.dateFinPrevue | date: 'dd/MM/yyyy' }}
+              @if (l.dateRetourEffectif) {
+                <br /><small class="muted">rendu le {{ l.dateRetourEffectif | date: 'dd/MM/yyyy' }}</small>
+              }
+            </td>
+            <td class="right">
+              {{ l.montantTotal | number: '1.2-2' }} DT
+              @if (l.penalite > 0) { <br /><small class="text-danger">dont {{ l.penalite | number: '1.2-2' }} DT de pénalité</small> }
+            </td>
+            <td><app-badge [value]="l.statut" /></td>
+            <td class="right">
+              <div class="row" style="justify-content: flex-end">
+                @switch (l.statut) {
+                  @case ('RESERVEE') {
+                    <button class="btn btn-sm btn-primary" (click)="depart(l)">Départ</button>
+                    <button class="btn btn-sm btn-danger" (click)="annuler(l)">Annuler</button>
+                  }
+                  @case ('EN_COURS') {
+                    <a [routerLink]="['/locations', l.id, 'retour']" class="btn btn-sm btn-primary">Retour</a>
+                  }
+                  @case ('TERMINEE') {
+                    <a [routerLink]="['/locations', l.id, 'retour']" class="btn btn-sm">Récapitulatif</a>
+                  }
+                }
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7" class="empty">Aucune location</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (page(); as p) {
+    @if (p.totalPages > 1) {
+      <div class="pagination">
+        <button class="btn btn-sm" [disabled]="p.page === 0" (click)="charger(p.page - 1)">← Précédent</button>
+        <span class="muted">Page {{ p.page + 1 }} / {{ p.totalPages }}</span>
+        <button class="btn btn-sm" [disabled]="p.page + 1 >= p.totalPages" (click)="charger(p.page + 1)">Suivant →</button>
+      </div>
+    }
+  }
+</div>

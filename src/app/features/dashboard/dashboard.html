@@ -1,0 +1,109 @@
+<div class="page-header">
+  <div>
+    <h1>Tableau de bord</h1>
+    <p>Vue d'ensemble de l'activité de l'agence</p>
+  </div>
+  <a routerLink="/locations/new" class="btn btn-primary">+ Nouvelle location</a>
+</div>
+
+@if (stats(); as s) {
+  <section class="kpis">
+    <div class="card kpi">
+      <span class="kpi-label">Véhicules disponibles</span>
+      <strong class="text-success">{{ s.vehiculesParStatut['DISPONIBLE'] ?? 0 }}</strong>
+      <small class="muted">sur {{ s.nombreVehicules }} véhicules</small>
+    </div>
+    <div class="card kpi">
+      <span class="kpi-label">Véhicules loués</span>
+      <strong style="color: var(--primary)">{{ s.vehiculesParStatut['LOUE'] ?? 0 }}</strong>
+      <small class="muted">taux d'occupation {{ s.tauxOccupation | number: '1.0-1' }} %</small>
+    </div>
+    <div class="card kpi">
+      <span class="kpi-label">En maintenance</span>
+      <strong style="color: var(--warning)">{{ s.vehiculesParStatut['MAINTENANCE'] ?? 0 }}</strong>
+      <small class="muted">indisponibles à la location</small>
+    </div>
+    <div class="card kpi">
+      <span class="kpi-label">CA du mois</span>
+      <strong>{{ s.chiffreAffairesMois | number: '1.2-2' }} <small>DT</small></strong>
+      <small class="muted">total : {{ s.chiffreAffairesTotal | number: '1.2-2' }} DT</small>
+    </div>
+    <div class="card kpi">
+      <span class="kpi-label">Locations en cours</span>
+      <strong>{{ s.locationsParStatut.EN_COURS }}</strong>
+      <small class="muted">{{ s.locationsParStatut.RESERVEE }} réservation(s) à venir</small>
+    </div>
+  </section>
+
+  <section class="charts">
+    <div class="card">
+      <h2>Chiffre d'affaires (6 derniers mois)</h2>
+      <div class="bar-chart">
+        @for (b of barres(); track b.mois) {
+          <div class="bar-col">
+            <span class="bar-value">{{ b.montant | number: '1.0-0' }}</span>
+            <div class="bar" [style.height.%]="b.hauteur" [title]="b.montant + ' DT'"></div>
+            <span class="bar-label">{{ b.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>État du parc</h2>
+      <div class="donut-wrap">
+        <div class="donut" [style.background]="anneau()">
+          <div class="donut-hole">
+            <strong>{{ s.nombreVehicules }}</strong>
+            <small>véhicules</small>
+          </div>
+        </div>
+        <ul class="legend">
+          <li><i style="background: #16a34a"></i> Disponibles ({{ s.vehiculesParStatut['DISPONIBLE'] ?? 0 }})</li>
+          <li><i style="background: #2563eb"></i> Loués ({{ s.vehiculesParStatut['LOUE'] ?? 0 }})</li>
+          <li><i style="background: #f59e0b"></i> Maintenance ({{ s.vehiculesParStatut['MAINTENANCE'] ?? 0 }})</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="charts">
+    <div class="card">
+      <h2>Véhicules les plus loués</h2>
+      <table>
+        <thead><tr><th>Véhicule</th><th class="right">Locations</th><th class="right">CA</th></tr></thead>
+        <tbody>
+          @for (v of s.topVehicules; track v.vehiculeId) {
+            <tr>
+              <td>{{ v.libelle }} <br /><small class="muted">{{ v.immatriculation }}</small></td>
+              <td class="right">{{ v.nombreLocations }}</td>
+              <td class="right">{{ v.chiffreAffaires | number: '1.2-2' }} DT</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="3" class="empty">Aucune location</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Locations en cours</h2>
+      <table>
+        <thead><tr><th>#</th><th>Période</th><th></th></tr></thead>
+        <tbody>
+          @for (l of enCours(); track l.id) {
+            <tr>
+              <td>#{{ l.id }}</td>
+              <td>{{ l.dateDebut | date: 'dd/MM' }} → {{ l.dateFinPrevue | date: 'dd/MM/yyyy' }}</td>
+              <td class="right"><a [routerLink]="['/locations', l.id, 'retour']" class="btn btn-sm">Retour</a></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="3" class="empty">Aucune location en cours</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+} @else {
+  <div class="card empty">Chargement des indicateurs…</div>
+}

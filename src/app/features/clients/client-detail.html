@@ -1,0 +1,81 @@
+@if (client(); as c) {
+  <div class="page-header">
+    <div>
+      <h1>{{ c.prenom }} {{ c.nom }} <app-badge [value]="c.categorieClient" /></h1>
+      <p>Client depuis le {{ c.dateInscription | date: 'longDate' }}</p>
+    </div>
+    <div class="row">
+      <a routerLink="/clients" class="btn">← Clients</a>
+      <a [routerLink]="['/clients', c.id, 'edit']" class="btn">Modifier</a>
+      <a routerLink="/locations/new" [queryParams]="{ clientId: c.id }" class="btn btn-primary"
+         [class.disabled]="!eligibilite()?.eligible">+ Nouvelle location</a>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))">
+    <div class="card">
+      <h2>Informations</h2>
+      <dl class="details">
+        <dt>CIN</dt><dd>{{ c.cin }}</dd>
+        <dt>Date de naissance</dt><dd>{{ c.dateNaissance | date: 'dd/MM/yyyy' }} ({{ c.age }} ans)</dd>
+        <dt>Email</dt><dd>{{ c.email }}</dd>
+        <dt>Téléphone</dt><dd>{{ c.telephone || '—' }}</dd>
+        <dt>Adresse</dt><dd>{{ c.adresse || '—' }}</dd>
+        <dt>N° de permis</dt><dd>{{ c.numeroPermis }}</dd>
+        <dt>Expiration permis</dt>
+        <dd [class.text-danger]="!c.permisValide">
+          {{ c.dateExpirationPermis | date: 'dd/MM/yyyy' }} {{ c.permisValide ? '' : '(expiré)' }}
+        </dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h2>Éligibilité à la location</h2>
+      @if (eligibilite(); as e) {
+        @if (e.eligible) {
+          <div class="alert alert-success">✔ Ce client peut louer un véhicule.</div>
+        } @else {
+          <div class="alert alert-danger">
+            ✖ Ce client ne peut pas louer :
+            <ul style="margin: 6px 0 0">
+              @for (m of e.motifs; track m) { <li>{{ m }}</li> }
+            </ul>
+          </div>
+        }
+        <dl class="details">
+          <dt>Âge ≥ 21 ans</dt><dd>{{ e.age >= 21 ? '✔' : '✖' }} {{ e.age }} ans</dd>
+          <dt>Permis valide</dt><dd>{{ e.permisValide ? '✔ Oui' : '✖ Non' }}</dd>
+          <dt>Remise fidélité</dt>
+          <dd>{{ e.categorieClient === 'VIP' ? '10 %' : e.categorieClient === 'FIDELE' ? '5 %' : 'Aucune' }}</dd>
+        </dl>
+      }
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 16px">
+    <h2>Historique des locations ({{ historique().length }})</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Véhicule</th><th>Période</th><th>Retour</th><th class="right">Montant</th><th>Statut</th></tr>
+        </thead>
+        <tbody>
+          @for (l of historique(); track l.id) {
+            <tr>
+              <td>#{{ l.id }}</td>
+              <td>Véhicule #{{ l.vehiculeId }}</td>
+              <td>{{ l.dateDebut | date: 'dd/MM/yyyy' }} → {{ l.dateFinPrevue | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ l.dateRetourEffectif ? (l.dateRetourEffectif | date: 'dd/MM/yyyy') : '—' }}</td>
+              <td class="right">{{ l.montantTotal | number: '1.2-2' }} DT</td>
+              <td><app-badge [value]="l.statut" /></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">Aucune location pour ce client</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+} @else {
+  <div class="card empty">Chargement…</div>
+}

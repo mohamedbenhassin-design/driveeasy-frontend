@@ -1,0 +1,54 @@
+.cars {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 18px;
+}
+
+.car {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.car-img {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #e2e8f0;
+  overflow: hidden;
+
+  // position absolue : l'image ne peut pas agrandir le conteneur (ratio 16/9 conservé)
+  img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  app-badge { position: absolute; top: 10px; left: 10px; }
+}
+
+.car-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+
+  h3 { margin: 0; font-size: 17px; }
+}
+
+.price {
+  font-weight: 700;
+  color: var(--primary);
+  small { font-weight: 400; color: var(--muted); font-size: 12px; }
+}
+
+.immat { margin: 0; font-size: 13px; }
+
+.specs {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  li { background: #f1f5f9; border-radius: 6px; padding: 3px 8px; font-size: 12px; color: #334155; }
+}
+
+.actions { margin-top: auto; }

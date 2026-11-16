@@ -1,0 +1,144 @@
+<div class="page-header">
+  <div>
+    <h1>Nouvelle location</h1>
+    <p>Assistant de réservation</p>
+  </div>
+  <a routerLink="/locations" class="btn">← Locations</a>
+</div>
+
+<ol class="stepper">
+  @for (e of etapes; track e; let i = $index) {
+    <li [class.done]="i < etape()" [class.current]="i === etape()" (click)="allerA(i)">
+      <span class="num">{{ i < etape() ? '✓' : i + 1 }}</span>{{ e }}
+    </li>
+  }
+</ol>
+
+<div class="card">
+  @if (erreur()) {
+    <div class="alert alert-danger">✖ {{ erreur() }}</div>
+  }
+  @switch (etape()) {
+    <!-- ===================== Étape 1 : client ===================== -->
+    @case (0) {
+      <h2>1. Choisir le client</h2>
+      <input class="search" [(ngModel)]="recherche" (ngModelChange)="filtrerClients()"
+             placeholder="Rechercher par nom, CIN, email…" />
+      <div class="choices">
+        @for (c of clientsFiltres(); track c.id) {
+          <button type="button" class="choice" [class.selected]="client()?.id === c.id" (click)="choisirClient(c)">
+            <strong>{{ c.prenom }} {{ c.nom }}</strong>
+            <small class="muted">CIN {{ c.cin }} · {{ c.age }} ans</small>
+            <app-badge [value]="c.categorieClient" />
+          </button>
+        }
+      </div>
+      @if (eligibilite(); as e) {
+        @if (e.eligible) {
+          <div class="alert alert-success">✔ {{ client()?.prenom }} est éligible à la location.</div>
+        } @else {
+          <div class="alert alert-danger">✖ Client non éligible : {{ e.motifs.join(' ; ') }}</div>
+        }
+      }
+      <div class="row nav">
+        <span class="spacer"></span>
+        <button class="btn btn-primary" [disabled]="!eligibilite()?.eligible" (click)="etape.set(1)">Suivant →</button>
+      </div>
+    }
+
+    <!-- ===================== Étape 2 : période ===================== -->
+    @case (1) {
+      <h2>2. Période de location</h2>
+      <div class="form-grid" style="max-width: 560px">
+        <div class="field">
+          <label for="debut">Date de début</label>
+          <input id="debut" type="date" [min]="aujourdHui" [(ngModel)]="dateDebut" />
+        </div>
+        <div class="field">
+          <label for="fin">Date de fin prévue</label>
+          <input id="fin" type="date" [min]="dateDebut" [(ngModel)]="dateFin" />
+        </div>
+      </div>
+      @if (erreurPeriode(); as err) {
+        <p class="text-danger">{{ err }}</p>
+      } @else {
+        <p class="muted">Durée : <strong>{{ nombreJours() }} jour(s)</strong></p>
+      }
+      <div class="row nav">
+        <button class="btn" (click)="etape.set(0)">← Précédent</button>
+        <span class="spacer"></span>
+        <button class="btn btn-primary" [disabled]="erreurPeriode() || chargement()" (click)="chercherVehicules()">
+          {{ chargement() ? 'Chargement…' : 'Voir les véhicules disponibles →' }}
+        </button>
+      </div>
+    }
+
+    <!-- ===================== Étape 3 : véhicule ===================== -->
+    @case (2) {
+      <h2>3. Véhicule disponible du {{ dateDebut | date: 'dd/MM' }} au {{ dateFin | date: 'dd/MM/yyyy' }}</h2>
+      <div class="choices">
+        @for (v of vehicules(); track v.id) {
+          <button type="button" class="choice" [class.selected]="vehicule()?.id === v.id" (click)="vehicule.set(v)">
+            <strong>{{ v.marque }} {{ v.modele }}</strong>
+            <small class="muted">{{ v.immatriculation }} · {{ libelle(v.categorie) }} · {{ libelle(v.carburant) }}</small>
+            <span class="price">{{ v.prixJournalier | number: '1.0-2' }} DT / jour</span>
+          </button>
+        } @empty {
+          <p class="empty">Aucun véhicule disponible sur cette période.</p>
+        }
+      </div>
+      <div class="row nav">
+        <button class="btn" (click)="etape.set(1)">← Précédent</button>
+        <span class="spacer"></span>
+        @if (!vehicule() && vehicules().length) {
+          <span class="muted">Cliquez sur un véhicule pour le sélectionner</span>
+        }
+        <button class="btn btn-primary" [disabled]="!vehicule() || chargement()" (click)="simuler()">
+          {{ chargement() ? 'Calcul…' : 'Simuler le prix →' }}
+        </button>
+      </div>
+    }
+
+    <!-- ===================== Étape 4 : simulation ===================== -->
+    @case (3) {
+      @if (simulation(); as s) {
+        <h2>4. Simulation du prix</h2>
+        <table class="calc">
+          <tbody>
+            <tr><td>Nombre de jours</td><td class="right">{{ s.nbJours }}</td></tr>
+            <tr><td>Prix journalier</td><td class="right">{{ s.prixJournalier | number: '1.2-2' }} DT</td></tr>
+            <tr><td>Coefficient catégorie ({{ libelle(s.categorieVehicule) }})</td><td class="right">× {{ s.coefficientCategorie }}</td></tr>
+            <tr><td>Montant brut</td><td class="right">{{ s.montantBrut | number: '1.2-2' }} DT</td></tr>
+            <tr>
+              <td>Remise fidélité ({{ libelle(s.categorieClient) }} : {{ s.tauxRemise | percent }})</td>
+              <td class="right text-success">− {{ s.montantRemise | number: '1.2-2' }} DT</td>
+            </tr>
+            <tr class="total"><td>Total</td><td class="right">{{ s.montantTotal | number: '1.2-2' }} DT</td></tr>
+          </tbody>
+        </table>
+        <p class="muted">En cas de retard : pénalité de 1,5 × {{ s.prixJournalier | number: '1.2-2' }} DT par jour.</p>
+      }
+      <div class="row nav">
+        <button class="btn" (click)="etape.set(2)">← Précédent</button>
+        <span class="spacer"></span>
+        <button class="btn btn-primary" (click)="etape.set(4)">Continuer →</button>
+      </div>
+    }
+
+    <!-- ===================== Étape 5 : confirmation ===================== -->
+    @case (4) {
+      <h2>5. Confirmation</h2>
+      <dl class="details">
+        <dt>Client</dt><dd>{{ client()?.prenom }} {{ client()?.nom }} (CIN {{ client()?.cin }})</dd>
+        <dt>Véhicule</dt><dd>{{ vehicule()?.marque }} {{ vehicule()?.modele }} · {{ vehicule()?.immatriculation }}</dd>
+        <dt>Période</dt><dd>du {{ dateDebut | date: 'dd/MM/yyyy' }} au {{ dateFin | date: 'dd/MM/yyyy' }} ({{ simulation()?.nbJours }} j)</dd>
+        <dt>Montant total</dt><dd><strong>{{ simulation()?.montantTotal | number: '1.2-2' }} DT</strong></dd>
+      </dl>
+      <div class="row nav">
+        <button class="btn" (click)="etape.set(3)">← Précédent</button>
+        <span class="spacer"></span>
+        <button class="btn btn-primary" [disabled]="envoi()" (click)="confirmer()">✔ Confirmer la réservation</button>
+      </div>
+    }
+  }
+</div>

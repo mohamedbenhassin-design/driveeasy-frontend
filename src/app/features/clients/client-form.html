@@ -1,0 +1,83 @@
+<div class="page-header">
+  <div>
+    <h1>{{ modeEdition ? 'Modifier le client' : 'Nouveau client' }}</h1>
+    <p>Les champs marqués * sont obligatoires</p>
+  </div>
+  <a routerLink="/clients" class="btn">← Retour</a>
+</div>
+
+@if (erreurServeur()) {
+  <div class="alert alert-danger">{{ erreurServeur() }}</div>
+}
+
+<form class="card" [formGroup]="form" (ngSubmit)="enregistrer()">
+  <h2>Identité</h2>
+  <div class="form-grid">
+    <div class="field">
+      <label for="cin">CIN *</label>
+      <input id="cin" formControlName="cin" maxlength="8" placeholder="8 chiffres" />
+      @if (erreur('cin'); as e) { <span class="error">{{ e }}</span> }
+    </div>
+    <div class="field">
+      <label for="nom">Nom *</label>
+      <input id="nom" formControlName="nom" />
+      @if (erreur('nom'); as e) { <span class="error">{{ e }}</span> }
+    </div>
+    <div class="field">
+      <label for="prenom">Prénom *</label>
+      <input id="prenom" formControlName="prenom" />
+      @if (erreur('prenom'); as e) { <span class="error">{{ e }}</span> }
+    </div>
+    <div class="field">
+      <label for="dateNaissance">Date de naissance *</label>
+      <input id="dateNaissance" type="date" formControlName="dateNaissance" />
+      @if (erreur('dateNaissance'); as e) { <span class="error">{{ e }}</span> }
+    </div>
+  </div>
+
+  <h2 style="margin-top: 24px">Contact</h2>
+  <div class="form-grid">
+    <div class="field">
+      <label for="email">Email *</label>
+      <input id="email" type="email" formControlName="email" />
+      @if (erreur('email'); as e) { <span class="error">{{ e }}</span> }
+    </div>
+    <div class="field">
+      <label for="telephone">Téléphone</label>
+      <input id="telephone" formControlName="telephone" placeholder="+216 …" />
+      @if (erreur('telephone'); as e) { <span class="error">{{ e }}</span> }
+    </div>
+    <div class="field">
+      <label for="adresse">Adresse</label>
+      <input id="adresse" formControlName="adresse" />
+    </div>
+  </div>
+
+  <h2 style="margin-top: 24px">Permis et fidélité</h2>
+  <div class="form-grid">
+    <div class="field">
+      <label for="numeroPermis">N° de permis *</label>
+      <input id="numeroPermis" formControlName="numeroPermis" />
+      @if (erreur('numeroPermis'); as e) { <span class="error">{{ e }}</span> }
+    </div>
+    <div class="field">
+      <label for="dateExpirationPermis">Expiration du permis *</label>
+      <input id="dateExpirationPermis" type="date" formControlName="dateExpirationPermis" />
+      @if (erreur('dateExpirationPermis'); as e) { <span class="error">{{ e }}</span> }
+    </div>
+    <div class="field">
+      <label for="categorieClient">Catégorie</label>
+      <select id="categorieClient" formControlName="categorieClient">
+        @for (c of categories; track c) { <option [value]="c">{{ libelle(c) }}</option> }
+      </select>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top: 24px">
+    <span class="spacer"></span>
+    <a routerLink="/clients" class="btn">Annuler</a>
+    <button type="submit" class="btn btn-primary" [disabled]="enregistrement()">
+      {{ modeEdition ? 'Enregistrer' : 'Créer le client' }}
+    </button>
+  </div>
+</form>

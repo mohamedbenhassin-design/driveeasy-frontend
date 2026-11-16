@@ -1,0 +1,94 @@
+@if (detail(); as d) {
+  <div class="page-header">
+    <div>
+      <h1>
+        {{ d.location.statut === 'TERMINEE' ? 'Récapitulatif de location' : 'Retour de véhicule' }}
+        #{{ d.location.id }} <app-badge [value]="d.location.statut" />
+      </h1>
+      <p>Créée le {{ d.location.dateCreation | date: 'dd/MM/yyyy HH:mm' }}</p>
+    </div>
+    <div class="row no-print">
+      <a routerLink="/locations" class="btn">← Locations</a>
+      @if (d.location.statut === 'TERMINEE') {
+        <button class="btn btn-primary" (click)="imprimer()">🖨 Imprimer</button>
+      }
+    </div>
+  </div>
+
+  @for (a of d.avertissements; track a) {
+    <div class="alert alert-warning">{{ a }}</div>
+  }
+
+  <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))">
+    <div class="card">
+      <h2>Client</h2>
+      <dl class="details">
+        <dt>Nom</dt><dd>{{ d.client?.prenom }} {{ d.client?.nom }}</dd>
+        <dt>CIN</dt><dd>{{ d.client?.cin }}</dd>
+        <dt>Téléphone</dt><dd>{{ d.client?.telephone || '—' }}</dd>
+        <dt>Catégorie</dt><dd>{{ d.client?.categorieClient }}</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h2>Véhicule</h2>
+      <dl class="details">
+        <dt>Modèle</dt><dd>{{ d.vehicule?.marque }} {{ d.vehicule?.modele }}</dd>
+        <dt>Immatriculation</dt><dd>{{ d.vehicule?.immatriculation }}</dd>
+        <dt>Prix appliqué</dt><dd>{{ d.location.prixJournalierApplique | number: '1.2-2' }} DT / jour</dd>
+        <dt>Km au départ</dt><dd>{{ d.location.kmDepart != null ? (d.location.kmDepart | number) + ' km' : '—' }}</dd>
+      </dl>
+    </div>
+  </div>
+
+  @if (d.location.statut === 'EN_COURS') {
+    <div class="card no-print" style="margin-top: 16px">
+      <h2>Saisie du retour</h2>
+      <div class="form-grid" style="max-width: 620px">
+        <div class="field">
+          <label for="km">Kilométrage au retour *</label>
+          <input id="km" type="number" [ngModel]="kmRetour()" (ngModelChange)="kmRetour.set($event)" />
+          @if (erreurKm(); as e) { <span class="error">{{ e }}</span> }
+        </div>
+        <div class="field">
+          <label for="date">Date de retour</label>
+          <input id="date" type="date" [min]="d.location.dateDebut" [ngModel]="dateRetour()" (ngModelChange)="dateRetour.set($event)" />
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="card" style="margin-top: 16px">
+    <h2>Facturation</h2>
+    <table style="max-width: 620px">
+      <tbody>
+        <tr><td>Période prévue</td><td class="right">{{ d.location.dateDebut | date: 'dd/MM/yyyy' }} → {{ d.location.dateFinPrevue | date: 'dd/MM/yyyy' }}</td></tr>
+        @if (d.location.statut === 'TERMINEE') {
+          <tr><td>Retour effectif</td><td class="right">{{ d.location.dateRetourEffectif | date: 'dd/MM/yyyy' }}</td></tr>
+          <tr><td>Kilométrage</td><td class="right">{{ d.location.kmDepart | number }} → {{ d.location.kmRetour | number }} km
+            ({{ (d.location.kmRetour ?? 0) - (d.location.kmDepart ?? 0) | number }} km parcourus)</td></tr>
+          <tr><td>Remise fidélité</td><td class="right text-success">− {{ d.location.montantRemise | number: '1.2-2' }} DT</td></tr>
+          <tr><td>Jours de retard</td><td class="right">{{ d.joursRetard }}</td></tr>
+          <tr><td>Pénalité de retard</td><td class="right text-danger">{{ d.location.penalite | number: '1.2-2' }} DT</td></tr>
+          <tr><td><strong>Montant total</strong></td><td class="right"><strong style="font-size: 20px">{{ d.location.montantTotal | number: '1.2-2' }} DT</strong></td></tr>
+        } @else if (apercu(); as a) {
+          <tr><td>Montant de la réservation</td><td class="right">{{ d.location.montantTotal | number: '1.2-2' }} DT</td></tr>
+          @if (a.distance != null) {
+            <tr><td>Distance parcourue</td><td class="right">{{ a.distance | number }} km</td></tr>
+          }
+          <tr><td>Jours de retard</td><td class="right">{{ a.retard }}</td></tr>
+          <tr><td>Pénalité (1,5 × prix journalier × retard)</td><td class="right text-danger">{{ a.penalite | number: '1.2-2' }} DT</td></tr>
+          <tr><td><strong>Total estimé</strong></td><td class="right"><strong style="font-size: 20px">{{ a.total | number: '1.2-2' }} DT</strong></td></tr>
+        }
+      </tbody>
+    </table>
+
+    @if (d.location.statut === 'EN_COURS') {
+      <div class="row no-print" style="margin-top: 18px">
+        <span class="spacer"></span>
+        <button class="btn btn-primary" [disabled]="!!erreurKm() || envoi()" (click)="valider()">✔ Valider le retour</button>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="card empty">Chargement…</div>
+}

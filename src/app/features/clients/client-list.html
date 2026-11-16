@@ -1,0 +1,74 @@
+<div class="page-header">
+  <div>
+    <h1>Clients</h1>
+    <p>{{ clients().length }} client(s)</p>
+  </div>
+  <a routerLink="/clients/new" class="btn btn-primary">+ Nouveau client</a>
+</div>
+
+@if (nbPermisExpires() > 0) {
+  <div class="alert alert-warning">⚠ {{ nbPermisExpires() }} client(s) avec un permis de conduire expiré.</div>
+}
+
+<div class="card">
+  <div class="filters">
+    <div class="field" style="flex: 1; max-width: 420px">
+      <label for="q">Rechercher</label>
+      <input id="q" name="q" [(ngModel)]="q" (ngModelChange)="rechercher($event)"
+             placeholder="Nom, CIN ou email…" autocomplete="off" />
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>CIN</th>
+          <th>Contact</th>
+          <th>Permis</th>
+          <th>Catégorie</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of pageCourante(); track c.id) {
+          <tr>
+            <td>
+              <a [routerLink]="['/clients', c.id]"><strong>{{ c.prenom }} {{ c.nom }}</strong></a>
+              <br /><small class="muted">{{ c.age }} ans</small>
+            </td>
+            <td>{{ c.cin }}</td>
+            <td>{{ c.email }}<br /><small class="muted">{{ c.telephone }}</small></td>
+            <td>
+              {{ c.numeroPermis }}<br />
+              @if (c.permisValide) {
+                <small class="muted">expire le {{ c.dateExpirationPermis | date: 'dd/MM/yyyy' }}</small>
+              } @else {
+                <small class="text-danger">⚠ expiré le {{ c.dateExpirationPermis | date: 'dd/MM/yyyy' }}</small>
+              }
+            </td>
+            <td><app-badge [value]="c.categorieClient" /></td>
+            <td class="right">
+              <div class="row" style="justify-content: flex-end">
+                <a [routerLink]="['/clients', c.id]" class="btn btn-sm">Fiche</a>
+                <a [routerLink]="['/clients', c.id, 'edit']" class="btn btn-sm">Modifier</a>
+                <button class="btn btn-sm btn-danger" (click)="supprimer(c)">Supprimer</button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="empty">Aucun client trouvé</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (nbPages() > 1) {
+    <div class="pagination">
+      <button class="btn btn-sm" [disabled]="page() === 0" (click)="page.set(page() - 1)">← Précédent</button>
+      <span class="muted">Page {{ page() + 1 }} / {{ nbPages() }}</span>
+      <button class="btn btn-sm" [disabled]="page() + 1 >= nbPages()" (click)="page.set(page() + 1)">Suivant →</button>
+    </div>
+  }
+</div>

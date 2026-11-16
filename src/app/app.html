@@ -1,0 +1,35 @@
+@if (loading()) {
+  <div class="loading-bar"></div>
+}
+
+<aside class="sidebar">
+  <a routerLink="/dashboard" class="brand">
+    <span class="brand-logo">DE</span>
+    <span>
+      <strong>DriveEasy</strong>
+      <small>Espace agence</small>
+    </span>
+  </a>
+
+  <nav>
+    @for (item of menu; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <span class="icon">{{ item.icon }}</span>{{ item.label }}
+      </a>
+    }
+  </nav>
+
+  <a routerLink="/locations/new" class="btn btn-primary sidebar-cta">+ Nouvelle location</a>
+</aside>
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<div class="toasts">
+  @for (t of notifications.toasts(); track t.id) {
+    <div class="toast" [class]="'toast toast-' + t.type" (click)="notifications.dismiss(t.id)">
+      {{ t.message }}
+    </div>
+  }
+</div>

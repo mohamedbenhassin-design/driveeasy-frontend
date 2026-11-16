@@ -1,0 +1,93 @@
+<div class="page-header">
+  <div>
+    <h1>Catalogue des véhicules</h1>
+    <p>{{ vehicules().length }} véhicule(s) trouvé(s)</p>
+  </div>
+  <a routerLink="/vehicules/new" class="btn btn-primary">+ Ajouter un véhicule</a>
+</div>
+
+<form class="card filters" (ngSubmit)="charger()">
+  <div class="field">
+    <label for="f-carburant">Carburant</label>
+    <select id="f-carburant" name="carburant" [(ngModel)]="filtres.carburant" (change)="charger()">
+      <option value="">Tous</option>
+      @for (c of carburants; track c) { <option [value]="c">{{ libelle(c) }}</option> }
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-categorie">Catégorie</label>
+    <select id="f-categorie" name="categorie" [(ngModel)]="filtres.categorie" (change)="charger()">
+      <option value="">Toutes</option>
+      @for (c of categories; track c) { <option [value]="c">{{ libelle(c) }}</option> }
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-statut">Statut</label>
+    <select id="f-statut" name="statut" [(ngModel)]="filtres.statut" (change)="charger()">
+      <option value="">Tous</option>
+      @for (s of statuts; track s) { <option [value]="s">{{ libelle(s) }}</option> }
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-prix">Prix max / jour (DT)</label>
+    <input id="f-prix" name="prixMax" type="number" min="0" [(ngModel)]="filtres.prixMax" placeholder="ex: 200" />
+  </div>
+  <div class="field">
+    <label for="f-tri">Trier par</label>
+    <select id="f-tri" name="tri" [ngModel]="tri()" (ngModelChange)="tri.set($event); page.set(0)">
+      <option value="prix-asc">Prix croissant</option>
+      <option value="prix-desc">Prix décroissant</option>
+      <option value="annee-desc">Plus récents</option>
+      <option value="marque">Marque</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Filtrer</button>
+  <button type="button" class="btn" (click)="reinitialiser()">Réinitialiser</button>
+</form>
+
+<div class="cars">
+  @for (v of pageCourante(); track v.id) {
+    <article class="card car">
+      <div class="car-img">
+        <img [src]="v.imageUrl || ''" [alt]="v.marque + ' ' + v.modele" (error)="imageParDefaut($event)" />
+        <app-badge [value]="v.statut" />
+      </div>
+      <div class="car-body">
+        <div class="row">
+          <h3>{{ v.marque }} {{ v.modele }}</h3>
+          <span class="spacer"></span>
+          <span class="price">{{ v.prixJournalier | number: '1.0-2' }} DT<small>/jour</small></span>
+        </div>
+        <p class="muted immat">{{ v.immatriculation }} · {{ v.annee }} · {{ v.couleur }}</p>
+        <ul class="specs">
+          <li>{{ libelle(v.categorie) }}</li>
+          <li>{{ libelle(v.carburant) }}</li>
+          <li>{{ libelle(v.boite) }}</li>
+          <li>{{ v.nbPlaces }} places</li>
+          <li>{{ v.kilometrage | number }} km</li>
+        </ul>
+        <div class="row actions">
+          <a [routerLink]="['/vehicules', v.id, 'edit']" class="btn btn-sm">Modifier</a>
+          @if (v.statut === 'DISPONIBLE') {
+            <button class="btn btn-sm" (click)="changerStatut(v, 'MAINTENANCE')">Maintenance</button>
+          } @else if (v.statut === 'MAINTENANCE') {
+            <button class="btn btn-sm" (click)="changerStatut(v, 'DISPONIBLE')">Remettre en service</button>
+          }
+          <span class="spacer"></span>
+          <button class="btn btn-sm btn-danger" (click)="supprimer(v)" [disabled]="v.statut === 'LOUE'"
+                  [title]="v.statut === 'LOUE' ? 'Impossible : véhicule loué' : 'Supprimer'">Supprimer</button>
+        </div>
+      </div>
+    </article>
+  } @empty {
+    <div class="card empty">Aucun véhicule ne correspond aux filtres.</div>
+  }
+</div>
+
+@if (nbPages() > 1) {
+  <div class="pagination">
+    <button class="btn btn-sm" [disabled]="page() === 0" (click)="page.set(page() - 1)">← Précédent</button>
+    <span class="muted">Page {{ page() + 1 }} / {{ nbPages() }}</span>
+    <button class="btn btn-sm" [disabled]="page() + 1 >= nbPages()" (click)="page.set(page() + 1)">Suivant →</button>
+  </div>
+}
