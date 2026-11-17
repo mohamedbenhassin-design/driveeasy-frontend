@@ -94,4 +94,4 @@ src/app/
 ### Retour de véhicule
 ![Retour](docs/captures/retour-vehicule.png)
 
-Les images des véhicules sont des illustrations SVG locales (`public/images/vehicules`) : l'application fonctionne sans connexion internet.
+Les photos des véhicules sont stockées localement (`public/images/vehicules`), l'application fonctionne donc sans connexion internet. Elles proviennent de Wikimedia Commons sous licences libres (CC BY-SA 4.0 / CC BY 2.0) : auteurs et liens dans [`public/images/vehicules/CREDITS.md`](public/images/vehicules/CREDITS.md).
