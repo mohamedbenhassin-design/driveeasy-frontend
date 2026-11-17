@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 340" role="img" aria-label="Dacia Duster">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0f2fe"/><stop offset="1" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="0.6" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="340" fill="url(#sky)"/>
+  <rect y="268" width="600" height="72" fill="#e2e8f0"/>
+  <rect y="268" width="600" height="3" fill="#cbd5e1"/>
+  <ellipse cx="320" cy="272" rx="250" ry="14" fill="#0f172a" opacity="0.12"/>
+  <path d="M84 236 L88 186 Q92 160 120 154 L190 146 L236 104 Q250 92 276 92 L430 92 Q452 92 466 106 L500 148 L528 154 Q552 160 556 186 L558 236 Z" fill="#ea580c" stroke="none" stroke-width="2"/>
+  <path d="M84 236 L88 186 Q92 160 120 154 L190 146 L236 104 Q250 92 276 92 L430 92 Q452 92 466 106 L500 148 L528 154 Q552 160 556 186 L558 236 Z" fill="url(#shine)"/>
+  <path d="M206 150 L244 112 Q254 102 276 102 L346 102 L346 150 Z M358 102 L428 102 Q444 102 454 114 L484 150 L358 150 Z" fill="#1e293b" opacity="0.85"/>
+  <rect x="514" y="186" width="22" height="10" rx="3" fill="#fde68a"/>
+  <rect x="102" y="190" width="16" height="10" rx="3" fill="#f87171"/>
+  <circle cx="172" cy="236" r="38" fill="#111827"/><circle cx="172" cy="236" r="20" fill="#cbd5e1"/><circle cx="172" cy="236" r="6" fill="#64748b"/><circle cx="470" cy="236" r="38" fill="#111827"/><circle cx="470" cy="236" r="20" fill="#cbd5e1"/><circle cx="470" cy="236" r="6" fill="#64748b"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 340" role="img" aria-label="Mercedes Classe C">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0f2fe"/><stop offset="1" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="0.6" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="340" fill="url(#sky)"/>
+  <rect y="268" width="600" height="72" fill="#e2e8f0"/>
+  <rect y="268" width="600" height="3" fill="#cbd5e1"/>
+  <ellipse cx="320" cy="272" rx="250" ry="14" fill="#0f172a" opacity="0.12"/>
+  <path d="M72 232 L78 202 Q84 182 110 176 L196 164 L254 124 Q270 112 298 112 L392 112 Q418 112 438 126 L484 160 L540 170 Q562 176 566 202 L568 232 Z" fill="#111827" stroke="none" stroke-width="2"/>
+  <path d="M72 232 L78 202 Q84 182 110 176 L196 164 L254 124 Q270 112 298 112 L392 112 Q418 112 438 126 L484 160 L540 170 Q562 176 566 202 L568 232 Z" fill="url(#shine)"/>
+  <path d="M210 166 L260 130 Q272 122 294 122 L344 122 L344 166 Z M356 122 L392 122 Q412 122 428 134 L466 166 L356 166 Z" fill="#1e293b" opacity="0.85"/>
+  <rect x="526" y="186" width="22" height="10" rx="3" fill="#fde68a"/>
+  <rect x="94" y="190" width="16" height="10" rx="3" fill="#f87171"/>
+  <circle cx="164" cy="232" r="38" fill="#111827"/><circle cx="164" cy="232" r="20" fill="#cbd5e1"/><circle cx="164" cy="232" r="6" fill="#64748b"/><circle cx="482" cy="232" r="38" fill="#111827"/><circle cx="482" cy="232" r="20" fill="#cbd5e1"/><circle cx="482" cy="232" r="6" fill="#64748b"/>
+</svg>

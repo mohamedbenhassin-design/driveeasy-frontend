@@ -70,4 +70,28 @@ src/app/
 
 ## Captures d'écran
 
-_À ajouter : tableau de bord, catalogue, assistant de réservation, retour de véhicule._
+### Tableau de bord
+![Tableau de bord](docs/captures/dashboard.png)
+
+### Catalogue des véhicules
+![Catalogue](docs/captures/catalogue.png)
+
+### Formulaire véhicule
+![Formulaire](docs/captures/formulaire-vehicule.png)
+
+### Liste des clients
+![Clients](docs/captures/clients.png)
+
+### Fiche client
+![Fiche client](docs/captures/fiche-client.png)
+
+### Nouvelle location : étape simulation du prix
+![Simulation](docs/captures/nouvelle-location-simulation.png)
+
+### Liste des locations
+![Locations](docs/captures/locations.png)
+
+### Retour de véhicule
+![Retour](docs/captures/retour-vehicule.png)
+
+Les images des véhicules sont des illustrations SVG locales (`public/images/vehicules`) : l'application fonctionne sans connexion internet.
